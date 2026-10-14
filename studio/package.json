@@ -1,0 +1,10 @@
+{
+  "name": "business-content-studio",
+  "private": true,
+  "type": "module",
+  "description": "AI Business Content & Marketing Studio — Phase 1 static prototype",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "start": "python3 -m http.server 8080"
+  }
+}

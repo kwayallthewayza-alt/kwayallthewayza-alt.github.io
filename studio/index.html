@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Business Content Studio</title>
+  <meta name="description" content="Create accurate, on-brand marketing content from verified business and product records.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Merriweather:wght@400;700;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b3d5c'/%3E%3Cpath d='M9 21l4-10 4 7 2-3 4 6z' fill='%23f5a524'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">CS</div><div>Content Studio<div class="muted small" style="font-weight:400">Phase 1 prototype</div></div></div>
+      <nav class="nav" aria-label="Main">
+        <a href="#/create" data-route="create">✨ Create content</a>
+        <a href="#/business" data-route="business">🏢 Business profile</a>
+        <a href="#/products" data-route="products">📦 Products</a>
+        <a href="#/library" data-route="library">🗂️ Library &amp; approvals</a>
+        <a href="#/data" data-route="data">💾 Data &amp; backup</a>
+      </nav>
+      <div class="biz-switch" id="biz-switch"></div>
+    </aside>
+    <main class="main" id="app" tabindex="-1"></main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
