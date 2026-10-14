@@ -62,6 +62,27 @@ function go(hash) {
   if (location.hash === hash) route();
   else location.hash = hash;
 }
+/** In-page confirmation (browser confirm() dialogs are blocked in some embedded viewers). */
+function ask(message, okLabel = 'Yes, continue') {
+  return new Promise((resolve) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-backdrop';
+    wrap.innerHTML = `<div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="ask-msg">
+      <p id="ask-msg"></p><div class="row" style="justify-content:flex-end">
+      <button class="btn" data-ans="no">Cancel</button><button class="btn primary" data-ans="yes"></button></div></div>`;
+    wrap.querySelector('#ask-msg').textContent = message;
+    wrap.querySelector('[data-ans="yes"]').textContent = okLabel;
+    const done = (v) => { wrap.remove(); document.removeEventListener('keydown', onKey); resolve(v); };
+    const onKey = (e) => { if (e.key === 'Escape') done(false); };
+    wrap.addEventListener('click', (e) => {
+      if (e.target === wrap || e.target.dataset.ans === 'no') done(false);
+      else if (e.target.dataset.ans === 'yes') done(true);
+    });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(wrap);
+    wrap.querySelector('[data-ans="no"]').focus();
+  });
+}
 function getPath(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
 }
@@ -382,8 +403,8 @@ function viewBusiness() {
   const rm = app.querySelector('#logo-remove');
   if (rm) rm.onclick = () => { b.logo = ''; persist(); viewBusiness(); };
   const del = app.querySelector('#del-biz');
-  if (del) del.onclick = () => {
-    if (!confirm(`Delete "${b.name}" with all its products and creatives? This cannot be undone.`)) return;
+  if (del) del.onclick = async () => {
+    if (!(await ask(`Delete "${b.name}" with all its products and creatives? This cannot be undone.`))) return;
     state.products = state.products.filter((p) => p.businessId !== b.id);
     state.creatives = state.creatives.filter((c) => c.businessId !== b.id);
     state.businesses = state.businesses.filter((x) => x.id !== b.id);
@@ -426,10 +447,10 @@ function viewProducts() {
     persist();
     viewProducts();
   }));
-  app.querySelectorAll('[data-del]').forEach((el) => (el.onclick = () => {
+  app.querySelectorAll('[data-del]').forEach((el) => (el.onclick = async () => {
     const p = getProduct(el.dataset.del);
     const used = state.creatives.filter((c) => c.productId === p.id).length;
-    if (!confirm(`Delete "${p.name}"?${used ? ` ${used} creative(s) use it and will be deleted too.` : ''}`)) return;
+    if (!(await ask(`Delete "${p.name}"?${used ? ` ${used} creative(s) use it and will be deleted too.` : ''}`))) return;
     state.products = state.products.filter((x) => x.id !== p.id);
     state.creatives = state.creatives.filter((c) => c.productId !== p.id);
     persist();
@@ -1083,9 +1104,9 @@ function viewLibrary() {
           <button class="btn small danger" data-del="${esc(c.id)}">Delete</button></div></div>`;
     }).join('') : '<div class="empty">Nothing yet. <a href="#/create">Create your first campaign</a>.</div>'}</div>`;
 
-  app.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => {
+  app.querySelectorAll('[data-del]').forEach((b) => (b.onclick = async () => {
     const c = state.creatives.find((x) => x.id === b.dataset.del);
-    if (!confirm(`Delete "${c.name}" and its approval history?`)) return;
+    if (!(await ask(`Delete "${c.name}" and its approval history?`))) return;
     state.creatives = state.creatives.filter((x) => x.id !== c.id);
     persist();
     viewLibrary();
@@ -1139,11 +1160,11 @@ function viewData() {
     const f = e.target.files[0];
     if (!f) return;
     const r = new FileReader();
-    r.onload = () => {
+    r.onload = async () => {
       try {
         const parsed = JSON.parse(r.result);
         if (!isValidState(parsed) || !parsed.businesses.length) throw new Error('invalid');
-        if (!confirm('Replace all current data with this backup?')) return;
+        if (!(await ask('Replace all current data with this backup?'))) return;
         state = parsed;
         if (!state.businesses.some((b) => b.id === state.activeBusinessId)) state.activeBusinessId = state.businesses[0].id;
         persist();
@@ -1155,14 +1176,14 @@ function viewData() {
     };
     r.readAsText(f);
   };
-  app.querySelector('#demo').onclick = () => {
-    if (!confirm('Replace all data with the demo business?')) return;
+  app.querySelector('#demo').onclick = async () => {
+    if (!(await ask('Replace all data with the demo business?'))) return;
     state = demoState();
     persist();
     go('#/create');
   };
-  app.querySelector('#reset').onclick = () => {
-    if (!confirm('Delete everything and start with an empty business profile?')) return;
+  app.querySelector('#reset').onclick = async () => {
+    if (!(await ask('Delete everything and start with an empty business profile?'))) return;
     state = emptyState();
     persist();
     go('#/business');

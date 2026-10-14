@@ -212,3 +212,5 @@ th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; colo
 .empty { text-align: center; padding: 2rem 1rem; color: var(--muted); }
 details summary { cursor: pointer; font-weight: 600; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(10, 16, 22, 0.5); display: grid; place-items: center; z-index: 60; padding: 16px; }
+.modal { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem; max-width: 420px; width: 100%; box-shadow: var(--shadow); }
